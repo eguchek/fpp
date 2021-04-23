@@ -49,6 +49,7 @@ $command_array = Array(
     "setPluginJSON"       => 'SetPluginJSON',
 	"saveScript"          => 'SaveScript',
 	"setTestMode"         => 'SetTestMode',
+	"setTestModeHSL"      => 'SetTestModeHSL',
 	"getTestMode"         => 'GetTestMode',
 	"setupExtGPIO"        => 'SetupExtGPIOJson',
 	"extGPIO"             => 'ExtGPIOJson',
@@ -1265,6 +1266,58 @@ function SaveScript()
 }
 
 /////////////////////////////////////////////////////////////////////////////
+function SetTestModeHSL()
+{
+	global $args;
+    $h = map($args['h'], 0, 360, 0, 1);
+    $s = map($args['s'], 0, 100, 0, 1);
+    $rgb = hslToRgb($h, $s, .5);
+	$args['data'] = json_encode([
+		"mode" => "RGBFill",
+		"color1" => $rgb[0],
+		"color2" => $rgb[1],
+		"color3" => $rgb[2],
+		"enabled" => 1,
+		"channelSet" => "1-1050",
+		"channelSetType" => "channelRange"
+	]);
+	SetTestMode();
+}
+
+function map($value, $fromLow, $fromHigh, $toLow, $toHigh) {
+	$fromRange = $fromHigh - $fromLow;
+	$toRange = $toHigh - $toLow;
+	$scaleFactor = $toRange / $fromRange;
+
+	$tmpValue = $value - $fromLow;
+	$tmpValue *= $scaleFactor;
+	return $tmpValue + $toLow;
+}
+
+function hue2rgb($p, $q, $t){
+	if($t < 0) $t += 1;
+	if($t > 1) $t -= 1;
+	if($t < 1/6) return $p + ($q - $p) * 6 * $t;
+	if($t < 1/2) return $q;
+	if($t < 2/3) return $p + ($q - $p) * (2/3 - $t) * 6;
+	return $p;
+}
+
+function hslToRgb($h, $s, $l){
+	if($s == 0){
+		$r = $l;
+		$g = $l;
+		$b = $l; // achromatic
+	}else{
+		$q = $l < 0.5 ? $l * (1 + $s) : $l + $s - $l * $s;
+		$p = 2 * $l - $q;
+		$r = hue2rgb($p, $q, $h + 1/3);
+		$g = hue2rgb($p, $q, $h);
+		$b = hue2rgb($p, $q, $h - 1/3);
+	}
+
+	return array(round($r * 255), round($g * 255), round($b * 255));
+}
 
 function SetTestMode()
 {
