@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # build the docker image
-docker build -t falconchristmas/fpp:latest -f Docker/Dockerfile .
+#docker build -t falconchristmas/fpp:latest -f Docker/Dockerfile .
 #or
-#docker build -t falconchristmas/fpp:latest  --build-arg EXTRA_INSTALL_FLAG=--skip-clone -f Docker/Dockerfile .
+docker build -t eguchek/fpp:4.6  --build-arg EXTRA_INSTALL_FLAG=--skip-clone -f Docker/Dockerfile .
 
 
 
